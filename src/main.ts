@@ -19,7 +19,14 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(process.env.PORT ?? 3000);
+  // medida de segurança para só disponibilizar os metodos listados
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Accept',
+  });
+
+  await app.listen(process.env.PORT ?? envs.APP_PORT);
   logger.log(`Application is running on port: ${envs.APP_PORT}`);
 }
 bootstrap();
