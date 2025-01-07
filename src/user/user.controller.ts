@@ -33,7 +33,7 @@ export class UserController {
 
   @Get('v1')
   findAll1() {
-    console.log({ findAll1: 'findAll1' });
+    // console.log({ findAll1: 'findAll1' });
     return this.userService.findAll1();
   }
 
@@ -41,18 +41,6 @@ export class UserController {
   findAll2() {
     // return this.usersService.findAll();
     return this.userService.findAll2();
-  }
-
-  @Get('v3')
-  findAll3() {
-    // return this.usersService.findAll();
-    return this.userService.findAll3();
-  }
-
-  @Get('v4')
-  findAll4() {
-    // return this.usersService.findAll();
-    return this.userService.findAll4();
   }
 
   @Get(':id')
