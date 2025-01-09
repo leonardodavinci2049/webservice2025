@@ -11,6 +11,7 @@ import { PrismaService } from 'src/core/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { getMd5 } from 'src/core/utls/generators/get_md5';
+import { ResultModel } from 'src/core/utls/result.model';
 
 @Injectable()
 export class AuthService {
@@ -32,7 +33,7 @@ export class AuthService {
   async signIn(loginAuthDto: LoginAuthDto) {
     const password = getMd5(loginAuthDto.SENHA);
 
-    console.log(loginAuthDto.LOGIN, loginAuthDto.SENHA);
+    //console.log(loginAuthDto.LOGIN, loginAuthDto.SENHA);
     const userLogin = await this.prisma.tbl_system_usuario.findFirst({
       where: {
         LOGIN: loginAuthDto.LOGIN,
@@ -52,16 +53,22 @@ export class AuthService {
     });
 
     if (!userLogin) {
-      throw new UnauthorizedException('Login e/ou Senha Incorretos.');
+      throw new UnauthorizedException(
+        new ResultModel(
+          100401,
+          'Login e/ou Senha Incorretos.',
+          'Unauthorized',
+          {},
+        ),
+      );
     }
 
     // console.log(userLogin);
 
-    return {
-      message: 'Token Success',
+    return new ResultModel(100200, 'Login Efetuado com sucesso', '', {
       token: this.createToken(userLogin),
-      data: userLogin,
-    };
+      user: userLogin,
+    });
   }
 
   async forget(email: string) {
