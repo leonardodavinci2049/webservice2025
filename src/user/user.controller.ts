@@ -4,7 +4,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Put,
@@ -14,41 +13,48 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { getMd5 } from 'src/core/utls/generators/get_md5';
 
-@Controller('v1/user')
+@Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
+  @Post('v1/register')
   create(@Body() data: CreateUserDto) {
     // console.log({ email, password });
     return this.userService.create(data);
   }
 
-  @Get()
+  @Post('v1/getMd5')
+  getMt5(@Body() date: { str: string }) {
+    // return this.usersService.findAll();
+    return getMd5(date.str);
+  }
+
+  @Get('v1/findMany')
   findAll() {
     // return this.usersService.findAll();
     return this.userService.findAll();
   }
 
-  @Get('v1')
+  @Get('v1/findManyV1')
   findAll1() {
     // console.log({ findAll1: 'findAll1' });
     return this.userService.findAll1();
   }
 
-  @Get('v2')
+  @Get('v1/findManyV2')
   findAll2() {
     // return this.usersService.findAll();
     return this.userService.findAll2();
   }
 
-  @Get(':id')
+  @Get('v1/findOne/:id')
   findOne(@ParamId() id: number) {
     return this.userService.findOne(id);
   }
 
-  @Put(':id')
+  @Put('v1/updateAny/:id')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
@@ -56,15 +62,7 @@ export class UserController {
     return this.userService.update(id, updateUserDto);
   }
 
-  @Patch(':id')
-  updatePartial(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return this.userService.update(id, updateUserDto);
-  }
-
-  @Delete(':id')
+  @Delete('v1/deleteOne/:id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.userService.remove(id);
   }

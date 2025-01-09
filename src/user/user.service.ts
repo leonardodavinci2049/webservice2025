@@ -5,10 +5,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/core/prisma/prisma.service';
 
-import * as bcrypt from 'bcrypt';
 import { envs } from 'src/core/config';
 import { createConnection, Connection } from 'mysql2/promise';
 import { DatabaseService } from 'src/database/database.service';
+import { getMd5 } from 'src/core/utls/generators/get_md5';
 
 @Injectable()
 export class UserService {
@@ -21,21 +21,18 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     try {
       //   const salt = await bcrypt.genSalt(10);
-
-      //  console.log('salt: ' + salt);
-      const password = await bcrypt.hash(createUserDto.SENHA, 10);
+      const olUUID = UuidV4();
+      const password = getMd5(createUserDto.SENHA);
 
       const offset = new Date().getTimezoneOffset() * 60000;
       createUserDto.DATADOCADASTRO = new Date(Date.now() - offset);
       createUserDto.DT_UPDATE = new Date(Date.now() - offset);
 
-      createUserDto.ID_UUID = UuidV4();
-
       // console.log(createUserDto.EMAIL_DE_LOGIN, createUserDto.SENHA, password);
 
       return await this.prisma.tbl_system_usuario.create({
         data: {
-          ID_UUID: createUserDto.ID_UUID,
+          ID_UUID: olUUID,
           ID_SYSTEM_CFG_CLIENTE: createUserDto.ID_SYSTEM_CFG_CLIENTE,
           ID_PESSOA: createUserDto.ID_PESSOA,
           LOGIN: createUserDto.LOGIN,
@@ -204,21 +201,6 @@ export class UserService {
         ID_USUARIO_SYSTEM: id,
       },
       data,
-    });
-  }
-
-  async updatePartial(id: number, data: UpdateUserDto) {
-    await this.userExists(id);
-
-    if (data.NOME == null || data.NOME == '') {
-      throw new NotFoundException('O nome é obrigatório.');
-    }
-
-    return this.prisma.tbl_system_usuario.update({
-      data: data,
-      where: {
-        ID_USUARIO_SYSTEM: id,
-      },
     });
   }
 
