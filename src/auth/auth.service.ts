@@ -23,6 +23,12 @@ export class AuthService {
     private readonly userService: UserService,
   ) {}
 
+  async register(registerAuthDto: RegisterAuthDto) {
+    const userRegister = await this.userService.create(registerAuthDto);
+
+    return this.createToken(userRegister);
+  }
+
   async signIn(loginAuthDto: LoginAuthDto) {
     const password = getMd5(loginAuthDto.SENHA);
 
@@ -145,7 +151,7 @@ export class AuthService {
       this.checkToken(token);
       return true;
     } catch (e) {
-      return false;
+      return e;
     }
   }
 
