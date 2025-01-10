@@ -15,7 +15,7 @@ import { ResultModel } from 'src/core/utls/result.model';
 
 @Injectable()
 export class AuthService {
-  private issuer = 'comsuporte';
+  private issuer = 'webservice';
   private audience = 'user';
 
   constructor(
@@ -156,9 +156,23 @@ export class AuthService {
     // rota que válida o token
     try {
       this.checkToken(token);
-      return true;
     } catch (e) {
-      return e;
+      throw new UnauthorizedException(e);
+    }
+
+    return true;
+  }
+
+  checkToken(token: string) {
+    try {
+      const payload = this.jwtService.verify(token, {
+        issuer: this.issuer, //verifica se o token foi emitido pelo servidor
+        audience: this.audience, // verifica se o token é para o usuário
+      });
+
+      return payload;
+    } catch (e) {
+      throw new BadRequestException(e);
     }
   }
 
@@ -168,18 +182,5 @@ export class AuthService {
         ID_USUARIO_SYSTEM: payload.id,
       },
     });
-  }
-
-  checkToken(token: string) {
-    try {
-      const data = this.jwtService.verify(token, {
-        issuer: this.issuer, //verifica se o token foi emitido pelo servidor
-        audience: this.audience, // verifica se o token é para o usuário
-      });
-
-      return data;
-    } catch (e) {
-      throw new BadRequestException(e);
-    }
   }
 }

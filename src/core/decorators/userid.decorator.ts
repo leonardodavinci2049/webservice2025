@@ -4,18 +4,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-export const UserDecorator = createParamDecorator(
+export const UserIdDecorator = createParamDecorator(
   (filter: string, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
 
-    console.log('Request.user: ' + { user: request.userRequest });
+    console.log('tokenPayload: ' + { userID: request.tokenPayload });
 
-    if (request.userRequest) {
-      if (filter) {
-        return request.userRequest[filter];
-      } else {
-        return request.userRequest;
-      }
+    if (request.tokenPayload.id) {
+      const userId = parseInt(request.tokenPayload.id); //
+
+      return { id: userId };
     } else {
       throw new NotFoundException(
         'Usuário não encontrado no Request. Use o AuthGuard para obter o usuário.',

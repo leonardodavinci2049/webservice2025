@@ -1,9 +1,18 @@
-import { Controller, Post, Body, Headers, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Headers,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { ForgetAuthDto } from './dto/forget-auth.dto';
 import { ResetAuthDto } from './dto/reset-auth.dto';
+import { AuthGuard } from 'src/core/guards/auth.guard';
+import { UserIdDecorator } from 'src/core/decorators/userid.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -30,13 +39,12 @@ export class AuthController {
     return this.authService.reset(ResetAuthDto.token, ResetAuthDto.SENHA);
   }
 
-  // UseGuards(AuthGuard);
+  @UseGuards(AuthGuard)
   @Post('v1/me')
-  async me(@Headers('authorization') headers) {
-    //console.log('headers: ', headers.split(' ')[1]);
+  me(@UserIdDecorator() user) {
+    //console.log('headers: ', user.id);
     try {
-      const token = headers.split(' ')[1];
-      return this.authService.isValidToken(token);
+      return this.authService.validateUser(user);
     } catch (e) {
       return e;
     }
